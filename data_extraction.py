@@ -1,4 +1,5 @@
 import yaml
+from flask_sqlalchemy import SQLAlchemy
 
 class DataExtractor:
     def __init__(self) -> None:
@@ -8,8 +9,15 @@ class DataExtractor:
         with open(cred_file, 'r') as f:
             credentials = yaml.safe_load(f)
             return credentials
+        
+    def init_db_engine(self, credentials):
+        db_engine = create_engine(credentials)
+        return db_engine
+
     
 extractor = DataExtractor()
 file = 'db_creds.yaml'
-dic = extractor.read_db_creds(file)
-print(dic)
+cred = extractor.read_db_creds(file)
+engine = extractor.init_db_engine(cred)
+
+
