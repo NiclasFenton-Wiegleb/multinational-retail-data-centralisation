@@ -5,7 +5,7 @@ class DataExtractor:
         pass
 
     def read_db_creds(self, cred_file):
-        with open(cred_file) as f:
+        with open(cred_file, 'r') as f:
             credentials = yaml.safe_load(f)
             return credentials
     
