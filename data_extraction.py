@@ -1,6 +1,6 @@
 import yaml
 import sqlalchemy
-
+import pandas as pd
 
 
 class DataExtractor:
@@ -25,7 +25,7 @@ class DataExtractor:
         self.port = credentials["RDS_PORT"]
         db_engine = sqlalchemy.create_engine(url = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
             self.user, self.password, self.host, self.port, self.database
-        )).connect()
+        ))
         return db_engine
     
     def list_db_tables(self, engine):
@@ -35,9 +35,11 @@ class DataExtractor:
         return list_tables
     
     def read_rds_table(self, table_name):
-        db_engine = sqlalchemy.create_engine(url = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
+        connection = sqlalchemy.create_engine(url = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
             self.user, self.password, self.host, self.port, self.database
         )).connect()
+        df = pd.read_sql_table(table_name, connection)
+        return df
 
 
 
@@ -49,11 +51,7 @@ engine = extractor.init_db_engine(cred)
 tables = extractor.list_db_tables(engine)
 metadata_obj = sqlalchemy.MetaData()
 metadata_obj.reflect(bind=engine)
-legacy_users = sqlalchemy.Table("legacy_users", metadata_obj)
+legacy_users = extractor.read_rds_table("legacy_users")
 
-print(extractor.host,
-        extractor.password,
-        extractor.user,
-        extractor.database,
-        extractor.port)
+print(type(legacy_users))
 
