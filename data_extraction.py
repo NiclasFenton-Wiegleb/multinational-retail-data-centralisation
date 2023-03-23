@@ -5,9 +5,11 @@ class DataExtractor:
         pass
 
     def read_db_creds(self, cred_file):
-        credentials = yaml.safe_load(cred_file)
-        return credentials
+        with open(cred_file) as f:
+            credentials = yaml.safe_load(f)
+            return credentials
     
 extractor = DataExtractor()
-file = open('db_creds.yaml', 'r')
+file = 'db_creds.yaml'
 dic = extractor.read_db_creds(file)
+print(dic)
