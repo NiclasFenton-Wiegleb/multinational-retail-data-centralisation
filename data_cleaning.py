@@ -10,6 +10,8 @@ class DataCleaning:
 
     def clean_user_data(self, dataframe):
         df = dataframe.set_index("index")
+        df["address"] = df["address"].astype("string")
+        df["address"] = df["address"].str.replace('\n', ', ', regex= True)
         return df
 
 extractor = data_extraction.DataExtractor()
