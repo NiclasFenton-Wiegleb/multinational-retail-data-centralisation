@@ -42,16 +42,15 @@ class DataExtractor:
         return df
 
 
-
     
-extractor = DataExtractor()
-file = 'db_creds.yaml'
-cred = extractor.read_db_creds(file)
-engine = extractor.init_db_engine(cred)
-tables = extractor.list_db_tables(engine)
-metadata_obj = sqlalchemy.MetaData()
-metadata_obj.reflect(bind=engine)
-legacy_users = extractor.read_rds_table("legacy_users")
+#extractor = DataExtractor()
+#file = 'db_creds.yaml'
+#cred = extractor.read_db_creds(file)
+#engine = extractor.init_db_engine(cred)
+#tables = extractor.list_db_tables(engine)
+#metadata_obj = sqlalchemy.MetaData()
+#metadata_obj.reflect(bind=engine)
+#legacy_users = extractor.read_rds_table("legacy_users")
 
-print(type(legacy_users))
+#print(type(legacy_users))
 
