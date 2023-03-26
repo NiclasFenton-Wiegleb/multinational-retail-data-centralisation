@@ -15,14 +15,14 @@ class DataExtractor:
     def read_db_creds(self, cred_file):
         with open(cred_file, 'r') as f:
             credentials = yaml.safe_load(f)
+            self.host = credentials["RDS_HOST"]
+            self.password = credentials["RDS_PASSWORD"]
+            self.user = credentials["RDS_USER"]
+            self.database = credentials["RDS_DATABASE"]
+            self.port = credentials["RDS_PORT"]
             return credentials
         
     def init_db_engine(self, credentials):
-        self.host = credentials["RDS_HOST"]
-        self.password = credentials["RDS_PASSWORD"]
-        self.user = credentials["RDS_USER"]
-        self.database = credentials["RDS_DATABASE"]
-        self.port = credentials["RDS_PORT"]
         db_engine = sqlalchemy.create_engine(url = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
             self.user, self.password, self.host, self.port, self.database
         ))
