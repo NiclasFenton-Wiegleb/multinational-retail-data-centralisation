@@ -16,16 +16,21 @@ class DataCleaning:
     def __init__(self) -> None:
         pass
 
-    def clean_user_data(self, dataframe):
+    def clean_store_data(self, dataframe):
         df = dataframe.set_index("index")
         df = df.reindex(columns= ["address", "longitude", "lat", "latitude", "locality", 
                                   "country_code", "continent", "store_code", "store_type", 
                                   "store_type", "staff_numbers", "opening_date"])
         remove_non_numerics = lambda val : tryconvert(val, None, float)
+        df = df.drop(df.index.get_loc(df.loc[df["lat"].notnull()]))
         df["address"] = df["address"].astype("string")
         df["longitude"] = df["longitude"].apply(remove_non_numerics)
         df["latitude"] = df["latitude"].apply(remove_non_numerics)
         df["address"] = df["address"].str.replace('\n', ', ', regex= True)
+        return df
+    
+    def clean_user_data(self, dataframe):
+        df = dataframe.set_index("index")
         return df
 
 extractor = data_extraction.DataExtractor()
@@ -42,11 +47,8 @@ orders_table = extractor.read_rds_table("orders_table")
 #cleaned data:
 
 cleaner = DataCleaning()
-clean_legacy_store_details = cleaner.clean_user_data(legacy_store_details)
+clean_user_data = cleaner.clean_user_data(legacy_users)
 
-print(clean_legacy_store_details)
-print(clean_legacy_store_details.info())
-print(clean_legacy_store_details["localitiy"])
-
-# "address", "longitude", "lat", "latitude", "locality", "country_code", "continent", "store_code", 
-# "store_type", "store_type", "staff_numbers", "opening_date"
+print(clean_user_data)
+print(clean_user_data.info())
+#print(clean_legacy_store_details["localitiy"])
