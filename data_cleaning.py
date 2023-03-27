@@ -45,10 +45,10 @@ class DataCleaning:
         df = df.drop(incorrect_data.index)
 
         #Assign correct data type to columns.
-        df[["first_name", "last_name", "company", "email_address", "address", "user_uuid"]] =  df[["first_name", 
-                                                                           "last_name", "company", 
-                                                                           "email_address", "address", "user_uuid"]].astype("string")
-        df[["country", "country_code"]] =  df[["country", "country_code"]].astype("category")
+        df[["first_name", "last_name", "company", "email_address", "address","phone_number", "user_uuid"]] =  df[["first_name", 
+                                                                           "last_name", "company", "email_address", "address",
+                                                                            "phone_number", "user_uuid"]].astype("string")
+        df["country"] =  df["country"].astype("category")
 
         #Change columns to datatime.
         df["date_of_birth"] =  df["date_of_birth"].str.replace("-", "")
@@ -57,8 +57,25 @@ class DataCleaning:
         df["date_of_birth"] = pd.to_datetime(df["date_of_birth"], format= date_format, errors= "coerce")
         df["join_date"] = pd.to_datetime(df["join_date"], format= date_format, errors= "coerce")
 
-        #Drop line space from address column.
-        df["address"] = df["address"].str.replace('\n', ', ', regex= True)
+        #Replace line space from address column.
+        df["address"] = df["address"].str.replace("\n", ", ", regex= True)
+
+        #Replace incorrect country codes and change type to category.
+        df["country_code"] = df["country_code"].str.replace("GGB", "GB")
+        df["country_code"] =  df["country_code"].astype("category")
+
+        #Clean phone numbers.
+        r1 = "[^0-9]+"
+        df["phone_number"] = df["phone_number"].str.replace(r1, "")
+        df["phone_number"] = df["phone_number"].str[-10:]
+
+        #Adding country extensions to the front of phone numbers
+        df["phone_number"] = df["country_code"].map({
+            "DE": "0049",
+            "GB": "0044",
+            "US": "001"
+        }).astype(str) + df["phone_number"]
+
         return df
 
 extractor = data_extraction.DataExtractor()
@@ -76,8 +93,6 @@ legacy_users = extractor.read_rds_table("legacy_users")
 
 cleaner = DataCleaning()
 clean_user_data = cleaner.clean_user_data(legacy_users)
-x = clean_user_data.columns
 
-#print(x)
-print(clean_user_data["address"])
-print(clean_user_data["address"].describe())
+print(clean_user_data)
+print(clean_user_data.info())
