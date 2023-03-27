@@ -29,30 +29,45 @@ class DataCleaning:
         df["address"] = df["address"].str.replace('\n', ', ', regex= True)
         return df
     
+# TO FIX: Phone numbers need to be uniform format;
+# errors with dates; drop rows with wrong info; check for duplicates
+
+
     def clean_user_data(self, dataframe):
         df = dataframe.set_index("index")
-        df[["first_name", "last_name", "company", "email_address"]] =  df[["first_name", 
+        null_df = df[df["first_name"] == "NULL"]
+        df = df.drop(null_df.index)
+        #incorrect_data = df[df["first_name"].str.isalpha() == False]
+        df[["first_name", "last_name", "company", "email_address", "address", "user_uuid"]] =  df[["first_name", 
                                                                            "last_name", "company", 
-                                                                           "email_address"]].astype("string")
+                                                                           "email_address", "address", "user_uuid"]].astype("string")
         df[["country", "country_code"]] =  df[["country", "country_code"]].astype("category")
+        df["date_of_birth"] =  df["date_of_birth"].str.replace("-", "")
+        df["join_date"] =  df["join_date"].str.replace("-", "")
+        date_format = "%Y%m%d"
+        df["date_of_birth"] = pd.to_datetime(df["date_of_birth"], format= date_format, errors= "coerce")
+        df["join_date"] = pd.to_datetime(df["join_date"], format= date_format, errors= "coerce")
         return df
 
 extractor = data_extraction.DataExtractor()
 file = 'db_creds.yaml'
 cred = extractor.read_db_creds(file)
 engine = extractor.init_db_engine(cred)
-tables = extractor.list_db_tables(engine)
-metadata_obj = sqlalchemy.MetaData()
-metadata_obj.reflect(bind=engine)
-legacy_store_details = extractor.read_rds_table("legacy_store_details")
+#tables = extractor.list_db_tables(engine)
+#metadata_obj = sqlalchemy.MetaData()
+#metadata_obj.reflect(bind=engine)
+#legacy_store_details = extractor.read_rds_table("legacy_store_details")
 legacy_users = extractor.read_rds_table("legacy_users")
-orders_table = extractor.read_rds_table("orders_table")
+#orders_table = extractor.read_rds_table("orders_table")
 
 #cleaned data:
 
 cleaner = DataCleaning()
 clean_user_data = cleaner.clean_user_data(legacy_users)
+x = clean_user_data[clean_user_data.isnull().any(axis=1)]
+y = clean_user_data[clean_user_data["first_name"].str.isalpha() == False]
 
-print(clean_user_data[["date_of_birth", "join_date"]])
-print(clean_user_data.info())
+print(x)
+#print(clean_user_data)
+#print(clean_user_data.describe())
 
