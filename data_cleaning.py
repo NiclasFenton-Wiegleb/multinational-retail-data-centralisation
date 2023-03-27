@@ -30,24 +30,35 @@ class DataCleaning:
         return df
     
 # TO FIX: Phone numbers need to be uniform format;
-# errors with dates; drop rows with wrong info; check for duplicates
+# errors with dates;
 
 
     def clean_user_data(self, dataframe):
+        #Assign index
         df = dataframe.set_index("index")
+
+        #Drop rows with invalid data.
         null_df = df[df["first_name"] == "NULL"]
         df = df.drop(null_df.index)
+
         incorrect_data = df[df["country_code"].str.isalpha() == False]
         df = df.drop(incorrect_data.index)
+
+        #Assign correct data type to columns.
         df[["first_name", "last_name", "company", "email_address", "address", "user_uuid"]] =  df[["first_name", 
                                                                            "last_name", "company", 
                                                                            "email_address", "address", "user_uuid"]].astype("string")
         df[["country", "country_code"]] =  df[["country", "country_code"]].astype("category")
+
+        #Change columns to datatime.
         df["date_of_birth"] =  df["date_of_birth"].str.replace("-", "")
         df["join_date"] =  df["join_date"].str.replace("-", "")
         date_format = "%Y%m%d"
         df["date_of_birth"] = pd.to_datetime(df["date_of_birth"], format= date_format, errors= "coerce")
         df["join_date"] = pd.to_datetime(df["join_date"], format= date_format, errors= "coerce")
+
+        #Drop line space from address column.
+        df["address"] = df["address"].str.replace('\n', ', ', regex= True)
         return df
 
 extractor = data_extraction.DataExtractor()
@@ -65,10 +76,8 @@ legacy_users = extractor.read_rds_table("legacy_users")
 
 cleaner = DataCleaning()
 clean_user_data = cleaner.clean_user_data(legacy_users)
-x = clean_user_data[clean_user_data.isnull().any(axis=1)]
-y = clean_user_data[clean_user_data["country_code"].str.isalpha() == False]
+x = clean_user_data.columns
 
-print(x)
-#print(clean_user_data)
-#print(clean_user_data.describe())
-
+#print(x)
+print(clean_user_data["address"])
+print(clean_user_data["address"].describe())
