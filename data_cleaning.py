@@ -37,7 +37,8 @@ class DataCleaning:
         df = dataframe.set_index("index")
         null_df = df[df["first_name"] == "NULL"]
         df = df.drop(null_df.index)
-        #incorrect_data = df[df["first_name"].str.isalpha() == False]
+        incorrect_data = df[df["country_code"].str.isalpha() == False]
+        df = df.drop(incorrect_data.index)
         df[["first_name", "last_name", "company", "email_address", "address", "user_uuid"]] =  df[["first_name", 
                                                                            "last_name", "company", 
                                                                            "email_address", "address", "user_uuid"]].astype("string")
@@ -65,7 +66,7 @@ legacy_users = extractor.read_rds_table("legacy_users")
 cleaner = DataCleaning()
 clean_user_data = cleaner.clean_user_data(legacy_users)
 x = clean_user_data[clean_user_data.isnull().any(axis=1)]
-y = clean_user_data[clean_user_data["first_name"].str.isalpha() == False]
+y = clean_user_data[clean_user_data["country_code"].str.isalpha() == False]
 
 print(x)
 #print(clean_user_data)
