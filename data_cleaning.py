@@ -29,9 +29,6 @@ class DataCleaning:
         df["address"] = df["address"].str.replace('\n', ', ', regex= True)
         return df
     
-# TO FIX: Phone numbers need to be uniform format;
-# errors with dates;
-
 
     def clean_user_data(self, dataframe):
         #Assign index
@@ -82,12 +79,8 @@ extractor = data_extraction.DataExtractor()
 file = 'db_creds.yaml'
 cred = extractor.read_db_creds(file)
 engine = extractor.init_db_engine(cred)
-#tables = extractor.list_db_tables(engine)
-#metadata_obj = sqlalchemy.MetaData()
-#metadata_obj.reflect(bind=engine)
-#legacy_store_details = extractor.read_rds_table("legacy_store_details")
 legacy_users = extractor.read_rds_table("legacy_users")
-#orders_table = extractor.read_rds_table("orders_table")
+
 
 #cleaned data:
 
