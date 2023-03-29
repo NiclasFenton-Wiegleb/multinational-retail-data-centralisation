@@ -1,6 +1,5 @@
 import data_cleaning
 import data_extraction
-import pandas as pd
 import sqlalchemy
 import psycopg2
 
@@ -22,29 +21,29 @@ class DatabaseConnector:
             host= "localhost",
             port= "5432"
         )
-        
+
         conn.autocommit = True
         cursor = conn.cursor()
 
         #Drop table if already exists
-        cursor.execute("drop table if exists user_data")
-
-        sql = '''CREATE TABLE user_data(index int, first_name char(20), last_name char(20), date_of_birth date, company char(100), 
-            email_address char(70), address char(100), country char(20), country_code char(2), phone_number char(20), join_date date, user_uuid char(100));'''
+        sql = f"DROP TABLE IF EXISTS {table_name}"
 
         cursor.execute(sql)
 
-        #Convert dataframe to sql
-        dataframe.to_sql("user_data", con=db_engine, if_exists='replace')
-        #cursor.execute("SELECT * FROM user_data").fetchall()
+        sql1 = f'''CREATE TABLE {table_name} (index int, first_name char(20), last_name char(20), date_of_birth date, company char(100), 
+            email_address char(70), address char(100), country char(20), country_code char(2), phone_number char(20),
+            join_date date, user_uuid char(100));'''
 
-
-            #Fetching all rows
-        sql1 = '''SELECT * from user_data;'''
         cursor.execute(sql1)
+
+        #Convert dataframe to sql
+        dataframe.to_sql(table_name, con=db_engine, if_exists='replace')
+
+        #Fetching all rows
+        sql2 = f"SELECT * from {table_name}"
+        cursor.execute(sql2)
         for i in cursor.fetchall():
             print(i)
-        cursor.commit()
         cursor.close()
         del cursor
         
@@ -66,41 +65,5 @@ clean_user_data = cleaner.clean_user_data(legacy_users)
 
 #Upload clean_user_data
 
-#uploader = DatabaseConnector()
-#data_upload = uploader.upload_to_db(clean_user_data, "user_data")
-
-#Connect to database
-db_engine = sqlalchemy.create_engine(url = "postgresql://postgres:pass@localhost/Sales_Data")
-
-#Upload dataframe to database
-conn = psycopg2.connect(
-    database= "Sales_Data",
-    user= "postgres",
-    password= "pass",
-    host= "localhost",
-    port= "5432"
-)
-
-conn.autocommit = True
-cursor = conn.cursor()
-
-#Drop table if already exists
-cursor.execute("drop table if exists user_data")
-
-sql = '''CREATE TABLE user_data(index int, first_name char(20), last_name char(20), date_of_birth date, company char(100), 
-    email_address char(70), address char(100), country char(20), country_code char(2), phone_number char(20), join_date date, user_uuid char(100));'''
-
-cursor.execute(sql)
-
-#Convert dataframe to sql
-clean_user_data.to_sql("user_data", con=db_engine, if_exists='replace')
-#cursor.execute("SELECT * FROM user_data").fetchall()
-
-
-#Fetching all rows
-sql1 = '''SELECT * from user_data;'''
-cursor.execute(sql1)
-for i in cursor.fetchall():
-    print(i)
-cursor.close()
-del cursor
+uploader = DatabaseConnector()
+data_upload = uploader.upload_to_db(clean_user_data, "user_data")
