@@ -1,11 +1,11 @@
 import pandas as pd
+import data_extraction
 
 class DataCleaning:
 
     def __init__(self) -> None:
         pass
 
-#FIX: Re-index dataframe after processing
 
     def clean_user_data(self, dataframe):
         #Assign index
@@ -50,8 +50,41 @@ class DataCleaning:
             "US": "001"
         }).astype(str) + df["phone_number"]
 
-        #Reset Index to be coherent
+        #Reset Index
         df.reset_index(drop=True)
 
         return df
     
+    def clean_card_data(self, dataframe):
+
+        #Drop incorrect format in card_number column
+        incorrect_data = dataframe[dataframe["card_number"].str.isnumeric() == False]
+        df = dataframe.drop(incorrect_data)
+
+        #Assign datatypes to columns
+        df["card_number"] =  df["card_number"].astype("int")
+
+        return df
+
+extractor = data_extraction.DataExtractor()
+card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
+#cleaner = DataCleaning()
+#clean_card_details = cleaner.clean_card_data(card_details)
+
+#Drop incorrect format in card_number column
+card_details["card_number"] = card_details["card_number"].str[-16:]
+incorrect_data = card_details[card_details["card_number"].str.isnumeric() == False]
+df = card_details.drop(incorrect_data.index)
+
+#Drop missing values
+df = df.dropna()
+
+#Assign datatypes to columns
+df["card_number"] =  df["card_number"].astype("int")
+
+#Change columns to datatime.
+df["expiry_date"] =  df["expiry_date"].str.replace("/", "")
+df["date_payment_confirmed"] =  df["date_payment_confirmed"].str.replace("-", "")
+
+print(df)
+print(df.info())

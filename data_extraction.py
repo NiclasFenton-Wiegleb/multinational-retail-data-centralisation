@@ -46,12 +46,3 @@ class DataExtractor:
         tabula.convert_into(pdf_path, "pdf_to_csv.csv", output_format= "csv", pages= "all")
         df = pd.read_csv("pdf_to_csv.csv")
         return df
-
-
-
-
-extractor = DataExtractor()
-df = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
-print(df)
-
-#print(card_data[0])
