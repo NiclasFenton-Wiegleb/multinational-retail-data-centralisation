@@ -86,5 +86,12 @@ df["card_number"] =  df["card_number"].astype("int")
 df["expiry_date"] =  df["expiry_date"].str.replace("/", "")
 df["date_payment_confirmed"] =  df["date_payment_confirmed"].str.replace("-", "")
 
-print(df)
+expiry_date_format = "%m%y"
+payment_date_format = "%Y%m%d"
+
+df["expiry_date"] = pd.to_datetime(df["expiry_date"], format= expiry_date_format, errors= "coerce")
+df["date_payment_confirmed"] = pd.to_datetime(df["date_payment_confirmed"], format= payment_date_format,
+                                               errors= "coerce")
+
+print(df.card_provider.unique())
 print(df.info())
