@@ -66,4 +66,4 @@ clean_user_data = cleaner.clean_user_data(legacy_users)
 #Upload clean_user_data
 
 uploader = DatabaseConnector()
-data_upload = uploader.upload_to_db(clean_user_data, "user_data")
+data_upload = uploader.upload_to_db(clean_user_data, "dim_users")

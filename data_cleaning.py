@@ -5,6 +5,8 @@ class DataCleaning:
     def __init__(self) -> None:
         pass
 
+#FIX: Re-index dataframe after processing
+
     def clean_user_data(self, dataframe):
         #Assign index
         df = dataframe.set_index("index")
@@ -47,6 +49,9 @@ class DataCleaning:
             "GB": "0044",
             "US": "001"
         }).astype(str) + df["phone_number"]
+
+        #Reset Index to be coherent
+        df.reset_index(drop=True)
 
         return df
     

@@ -1,6 +1,7 @@
 import yaml
 import sqlalchemy
 import pandas as pd
+import tabula
 
 
 class DataExtractor:
@@ -22,7 +23,7 @@ class DataExtractor:
             self.port = credentials["RDS_PORT"]
             return credentials
         
-    def init_db_engine(self, credentials):
+    def init_db_engine(self):
         db_engine = sqlalchemy.create_engine(url = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
             self.user, self.password, self.host, self.port, self.database
         ))
@@ -40,7 +41,17 @@ class DataExtractor:
         )).connect()
         df = pd.read_sql_table(table_name, connection)
         return df
+    
+    def retrieve_pdf_data(self, pdf_path):
+        tabula.convert_into(pdf_path, "pdf_to_csv.csv", output_format= "csv", pages= "all")
+        df = pd.read_csv("pdf_to_csv.csv")
+        return df
 
 
 
 
+extractor = DataExtractor()
+df = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
+print(df)
+
+#print(card_data[0])
