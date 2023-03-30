@@ -53,17 +53,17 @@ class DatabaseConnector:
 extractor = data_extraction.DataExtractor()
 file = 'db_creds.yaml'
 cred = extractor.read_db_creds(file)
-engine = extractor.init_db_engine(cred)
-legacy_users = extractor.read_rds_table("legacy_users")
+engine = extractor.init_db_engine()
+card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
 
 #cleaned data:
 
 cleaner = data_cleaning.DataCleaning()
-clean_user_data = cleaner.clean_user_data(legacy_users)
+clean_card_details = cleaner.clean_card_data(card_details)
 
 
 #Upload clean_user_data
 
 uploader = DatabaseConnector()
-data_upload = uploader.upload_to_db(clean_user_data, "dim_users")
+data_upload = uploader.upload_to_db(clean_card_details, "dim_card_details")

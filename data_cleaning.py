@@ -58,7 +58,7 @@ class DataCleaning:
 
         #Drop incorrect format in card_number column
         dataframe["card_number"] = dataframe["card_number"].str[-16:]
-        incorrect_data = dataframe[card_details["card_number"].str.isnumeric() == False]
+        incorrect_data = dataframe[dataframe["card_number"].str.isnumeric() == False]
         df = dataframe.drop(incorrect_data.index)
 
         #Drop missing values
