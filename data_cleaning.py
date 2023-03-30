@@ -1,5 +1,4 @@
 import pandas as pd
-import data_extraction
 
 class DataCleaning:
 
@@ -58,40 +57,36 @@ class DataCleaning:
     def clean_card_data(self, dataframe):
 
         #Drop incorrect format in card_number column
-        incorrect_data = dataframe[dataframe["card_number"].str.isnumeric() == False]
-        df = dataframe.drop(incorrect_data)
+        dataframe["card_number"] = dataframe["card_number"].str[-16:]
+        incorrect_data = dataframe[card_details["card_number"].str.isnumeric() == False]
+        df = dataframe.drop(incorrect_data.index)
 
-        #Assign datatypes to columns
+        #Drop missing values
+        df = df.dropna()
+
+        #Assign datatypes to card_number columns
         df["card_number"] =  df["card_number"].astype("int")
+
+
+        #Change columns to datatime.
+        df["expiry_date"] =  df["expiry_date"].str.replace("/", "")
+        df["date_payment_confirmed"] =  df["date_payment_confirmed"].str.replace("-", "")
+
+        expiry_date_format = "%m%y"
+        payment_date_format = "%Y%m%d"
+
+        df["expiry_date"] = pd.to_datetime(df["expiry_date"], format= expiry_date_format, errors= "coerce")
+        df["date_payment_confirmed"] = pd.to_datetime(df["date_payment_confirmed"], format= payment_date_format,
+                                                    errors= "coerce")
+
+        #Make card_provider column more uniform
+        df["card_provider"] =  df["card_provider"].str.replace(" 16 digit", "")
+        df["card_provider"] =  df["card_provider"].str.replace(" 15 digit", "")
+        df["card_provider"] =  df["card_provider"].str.replace(" 19 digit", "")
+        df["card_provider"] =  df["card_provider"].str.replace(" 13 digit", "")
+
+        #Assign str datatype to card_provider column
+        df["card_provider"] =  df["card_provider"].astype("category")
 
         return df
 
-extractor = data_extraction.DataExtractor()
-card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
-#cleaner = DataCleaning()
-#clean_card_details = cleaner.clean_card_data(card_details)
-
-#Drop incorrect format in card_number column
-card_details["card_number"] = card_details["card_number"].str[-16:]
-incorrect_data = card_details[card_details["card_number"].str.isnumeric() == False]
-df = card_details.drop(incorrect_data.index)
-
-#Drop missing values
-df = df.dropna()
-
-#Assign datatypes to columns
-df["card_number"] =  df["card_number"].astype("int")
-
-#Change columns to datatime.
-df["expiry_date"] =  df["expiry_date"].str.replace("/", "")
-df["date_payment_confirmed"] =  df["date_payment_confirmed"].str.replace("-", "")
-
-expiry_date_format = "%m%y"
-payment_date_format = "%Y%m%d"
-
-df["expiry_date"] = pd.to_datetime(df["expiry_date"], format= expiry_date_format, errors= "coerce")
-df["date_payment_confirmed"] = pd.to_datetime(df["date_payment_confirmed"], format= payment_date_format,
-                                               errors= "coerce")
-
-print(df.card_provider.unique())
-print(df.info())
