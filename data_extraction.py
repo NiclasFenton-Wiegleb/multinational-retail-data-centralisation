@@ -2,6 +2,7 @@ import yaml
 import sqlalchemy
 import pandas as pd
 import tabula
+import requests
 
 
 class DataExtractor:
@@ -46,3 +47,16 @@ class DataExtractor:
         tabula.convert_into(pdf_path, "pdf_to_csv.csv", output_format= "csv", pages= "all")
         df = pd.read_csv("pdf_to_csv.csv")
         return df
+    
+    def list_number_of_stores(self, api, auth_details):
+        request = requests.get(api, headers= auth_details)
+        data = request.json()
+        return data["number_stores"]
+
+header_details = {
+    "x-api-key": "yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX"
+}
+extractor = DataExtractor()
+number_stores = extractor.list_number_of_stores("https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores", header_details)
+
+print(number_stores)
