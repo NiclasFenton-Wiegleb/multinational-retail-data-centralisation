@@ -133,21 +133,3 @@ class DataCleaning:
         df[["country_code", "continent", "store_type"]] = df[["country_code", "continent", "store_type"]].astype("category")
 
         return df
-
-
-df = pd.read_csv("store_data.csv")
-
-cleaner = DataCleaning()
-df2 = cleaner.clean_store_data(df)
-
-print(df2)
-print(df2.info())
-
-'''
-header_details = {
-    "x-api-key": "yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX"
-}
-extractor = data_extraction.DataExtractor()
-
-df = extractor.retrieve_store_data("https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/", header_details)
-'''

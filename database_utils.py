@@ -2,6 +2,7 @@ import data_cleaning
 import data_extraction
 import sqlalchemy
 import psycopg2
+import pandas as pd
 
 class DatabaseConnector:
 
@@ -56,14 +57,15 @@ cred = extractor.read_db_creds(file)
 engine = extractor.init_db_engine()
 card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
+df = pd.read_csv("store_data.csv")
 
 #cleaned data:
 
 cleaner = data_cleaning.DataCleaning()
-clean_card_details = cleaner.clean_card_data(card_details)
+clean_store_details = cleaner.clean_store_data(df)
 
 
 #Upload clean_user_data
 
 uploader = DatabaseConnector()
-data_upload = uploader.upload_to_db(clean_card_details, "dim_card_details")
+data_upload = uploader.upload_to_db(clean_store_details, "dim_store_details")
