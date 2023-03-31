@@ -52,11 +52,34 @@ class DataExtractor:
         request = requests.get(api, headers= auth_details)
         data = request.json()
         return data["number_stores"]
+    
+    def retrievt_store_data(self, api, auth_details):
+
+        #Get the number of stores
+        number_stores = self.list_number_of_stores("https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores", header_details)
+
+        #Request data for each store and append to 
+        #store_data as list of dictionaries
+        store_data = []
+        for store_number in range(number_stores):
+            request = requests.get(api + f"{store_number}", headers= header_details)
+            data = request.json()
+            store_data.append(data)
+            
+        #Convert list of dictionaries to dataframe and select index
+        df = pd.DataFrame(store_data)
+        df = df.set_index("index")
+
+        return df
+    
 
 header_details = {
     "x-api-key": "yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX"
 }
 extractor = DataExtractor()
-number_stores = extractor.list_number_of_stores("https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/number_stores", header_details)
 
-print(number_stores)
+df = extractor.retrievt_store_data("https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/", header_details)
+
+
+print(df)
+print(df.info())
