@@ -1,4 +1,5 @@
 import pandas as pd
+import data_extraction
 
 class DataCleaning:
 
@@ -89,4 +90,62 @@ class DataCleaning:
         df["card_provider"] =  df["card_provider"].astype("category")
 
         return df
+    
+    def clean_store_data(self, dataframe):
 
+        return dataframe
+
+
+df = pd.read_csv("store_data.csv")
+
+#clean store data
+
+#Set index column as index
+df = df.set_index("index")
+
+#Drop invalid and empty rows
+incorrect_data = df[(df["lat"].map(type) == str) == True]
+df = df.drop(incorrect_data.index)
+
+null_df = df[df["staff_numbers"].isnull()]
+df = df.drop(null_df.index)
+
+#Drop empty column
+df = df.drop("lat", axis= 1)
+
+#Change column order to be more intuitive
+df = df.loc[:, ["address", "locality", "country_code", "longitude", "latitude",  "continent", "store_type",
+           "store_code", "staff_numbers", "opening_date" ]]
+
+#Replace line space from address column.
+df["address"] = df["address"].str.replace("\n", ", ", regex= True)
+
+#Clean staff_numbers
+r1 = "[^0-9]+"
+df["staff_numbers"] = df["staff_numbers"].str.replace(r1, "")
+
+#Clean continent column
+df["continent"] = df["continent"].str.replace("ee", "")
+
+#Change columns to datatime.
+df["opening_date"] =  df["opening_date"].str.replace("-", "")
+
+opening_date_format = "%Y%m%d"
+df["opening_date"] = pd.to_datetime(df["opening_date"], format= opening_date_format, errors= "coerce")
+
+#Assign types to columns
+df["staff_numbers"] = df["staff_numbers"].astype(int)
+df[["longitude", "latitude"]] = df[["longitude", "latitude"]].astype(float)
+df[["country_code", "continent", "store_type"]] = df[["country_code", "continent", "store_type"]].astype("category")
+
+print(df)
+print(df.info())
+
+'''
+header_details = {
+    "x-api-key": "yFBQbwXe9J3sd6zWVAMrK6lcxxr0q1lr2PT6DDMX"
+}
+extractor = data_extraction.DataExtractor()
+
+df = extractor.retrieve_store_data("https://aqj7u5id95.execute-api.eu-west-1.amazonaws.com/prod/store_details/", header_details)
+'''
