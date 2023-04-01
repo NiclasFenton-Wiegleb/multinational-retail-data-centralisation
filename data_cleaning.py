@@ -152,7 +152,11 @@ df = df.drop(incorrect_data.index)
 df["product_price"] = df["product_price"].str.strip("£")
 df["product_price"] = df["product_price"].astype(float)
 
-#Convert all weights to kg in weight column
+#Create column with weight units
+df["weights_unit"] = df["weight"].apply(lambda x: x[-2:] if type(x) == str else x)
+df["weights_unit"] = df["weights_unit"].str.replace('\d+', '')
 
-print(df["product_price"].unique())
+
+print(df["weight"].unique())
+print(df[df["weights_unit"] == "g"])
 print(df.info())
