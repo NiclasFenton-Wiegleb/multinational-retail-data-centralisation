@@ -1,5 +1,4 @@
 import pandas as pd
-import data_extraction
 
 class DataCleaning:
 
@@ -133,3 +132,27 @@ class DataCleaning:
         df[["country_code", "continent", "store_type"]] = df[["country_code", "continent", "store_type"]].astype("category")
 
         return df
+    
+
+#Clean products data
+
+#Load file and assign index
+df = pd.read_csv("products.csv")
+df.rename(columns= {"Unnamed: 0": "index"}, inplace= True)
+df = df.set_index("index")
+
+#Identify and drop incorrect data entries
+incorrect_data = pd.read_csv("products.csv")
+incorrect_data["product_price"] = incorrect_data["product_price"].str.strip("£")
+incorrect_data["product_price"] = incorrect_data["product_price"].str.replace(".", "")
+incorrect_data = incorrect_data[incorrect_data["product_price"].str.isnumeric() == False]
+df = df.drop(incorrect_data.index)
+
+#Assign product_price as float type
+df["product_price"] = df["product_price"].str.strip("£")
+df["product_price"] = df["product_price"].astype(float)
+
+#Convert all weights to kg in weight column
+
+print(df["product_price"].unique())
+print(df.info())
