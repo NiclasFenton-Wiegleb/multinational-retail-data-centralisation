@@ -159,16 +159,20 @@ df["weights_unit"] = df["weights_unit"].str.replace('\d+', '')
 #Clean weight column
 df["weight"] = df["weight"].str.replace("kg", "")
 df["weight"] = df["weight"].str.replace("g", "")
+df["weight"] = df["weight"].str.replace("ml", "")
+df["weight"] = df["weight"].str.replace("oz", "")
 
 #Multiply values in format ___ x ___ in weight column
 df["weight"] = df["weight"].apply(lambda x: int(x.split(" x ")[0]) * int(x.split(" x ")[1]) if " x " in str(x) else x)
 
 #Convert values in g to kg
 df["weight"][df["weights_unit"] == "g"] = df["weight"][df["weights_unit"] == "g"].apply(lambda x : float(x)/1000)
+df["weight"][df["weights_unit"] == "ml"] = df["weight"][df["weights_unit"] == "ml"].apply(lambda x : float(x)/1000)
+df["weight"][df["weights_unit"] == "oz"] = df["weight"][df["weights_unit"] == "oz"].apply(lambda x : float(x)/35.274)
 
 
-#print(df["weight"].unique())
-print(df["weight"][df["weights_unit"] == "g"])
-print(df.loc[383])
+
+print(df["weights_unit"].unique())
+print(df[df["weights_unit"] == " ."])
 print(df.info())
 
