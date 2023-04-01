@@ -156,7 +156,17 @@ df["product_price"] = df["product_price"].astype(float)
 df["weights_unit"] = df["weight"].apply(lambda x: x[-2:] if type(x) == str else x)
 df["weights_unit"] = df["weights_unit"].str.replace('\d+', '')
 
+#Clean weight column
+df["weight"] = df["weight"].str.replace("kg", "")
+df["weight"] = df["weight"].str.replace("g", "")
+
+#Multiply values in format ___ x ___ in weight column
+df["weight"] = df["weight"].apply(lambda x: int(x.split(" x ")[0]) * int(x.split(" x ")[1]) if " x " in str(x) else x)
+
+
 
 print(df["weight"].unique())
-print(df[df["weights_unit"] == "g"])
+print(df[df["weight"].str.contains("x") == True])
+print(df.loc[383])
 print(df.info())
+
