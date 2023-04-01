@@ -3,6 +3,7 @@ import sqlalchemy
 import pandas as pd
 import tabula
 import requests
+import boto3
 
 
 class DataExtractor:
@@ -71,3 +72,26 @@ class DataExtractor:
         df = df.set_index("index")
 
         return df
+    
+    def extract_from_s3(self, s3_address):
+        
+        #Get s3_address
+        response = requests.get(s3_address)
+
+        #Open file from response and save as csv
+        with open("products.csv", "wb") as f:
+            f.write(response.content)
+        
+        #Convert csv file to dataframe
+        df = pd.read_csv("products.csv")
+
+        return df
+
+
+url = "https://s3.us-east-1.amazonaws.com/data-handling-public/products.csv"
+
+extractor = DataExtractor()
+product_data = extractor.extract_from_s3(url)
+
+print(product_data)
+print(product_data.info())
