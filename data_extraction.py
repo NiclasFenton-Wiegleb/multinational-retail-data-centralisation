@@ -75,23 +75,18 @@ class DataExtractor:
     
     def extract_from_s3(self, s3_address):
         
-        #Get s3_address
-        response = requests.get(s3_address)
+        #Initiate s3
+        s3 = boto3.client("s3", "us-east-1")
 
-        #Open file from response and save as csv
-        with open("products.csv", "wb") as f:
-            f.write(response.content)
-        
+        #Split s3_address into elements
+        string = s3_address.split("/")
+        bucket = string[2]
+        file = string[3]
+
+        #Download file from s3 bucket
+        s3.download_file(bucket, file, file)
+
         #Convert csv file to dataframe
-        df = pd.read_csv("products.csv")
+        df = pd.read_csv(file)
 
         return df
-
-
-url = "https://s3.us-east-1.amazonaws.com/data-handling-public/products.csv"
-
-extractor = DataExtractor()
-product_data = extractor.extract_from_s3(url)
-
-print(product_data)
-print(product_data.info())
