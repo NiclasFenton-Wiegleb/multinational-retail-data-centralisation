@@ -163,10 +163,12 @@ df["weight"] = df["weight"].str.replace("g", "")
 #Multiply values in format ___ x ___ in weight column
 df["weight"] = df["weight"].apply(lambda x: int(x.split(" x ")[0]) * int(x.split(" x ")[1]) if " x " in str(x) else x)
 
+#Convert values in g to kg
+df["weight"][df["weights_unit"] == "g"] = df["weight"][df["weights_unit"] == "g"].apply(lambda x : float(x)/1000)
 
 
-print(df["weight"].unique())
-print(df[df["weight"].str.contains("x") == True])
+#print(df["weight"].unique())
+print(df["weight"][df["weights_unit"] == "g"])
 print(df.loc[383])
 print(df.info())
 
