@@ -205,3 +205,14 @@ class DataCleaning:
         return df
 
 
+#Load data
+df = pd.read_csv("orders_table.csv")
+
+#Set index
+df.set_index("index", inplace= True)
+
+#Drop first_name, last_name and 1 column
+df.drop(["first_name", "last_name", "1"], axis= 1, inplace= True)
+
+print(df[df["level_0"].isnull() == True])
+print(df.info())

@@ -100,3 +100,8 @@ engine = extractor.init_db_engine()
 card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
 lst_tables = extractor.list_db_tables(engine)
+orders_table = extractor.read_rds_table("orders_table")
+
+orders_table.to_csv("orders_table.csv", index= False)
+
+print(orders_table)
