@@ -214,3 +214,29 @@ class DataCleaning:
         df.drop(["first_name", "last_name", "1"], axis= 1, inplace= True)
 
         return df
+    
+    def clean_date_details(self, dataframe):
+        df = dataframe
+
+        #Identify and drop empty rows
+        null_data = df[df["month"].isnull() == True]
+        df.drop(null_data.index, inplace= True)
+
+        #Identify and drop incorrect data
+        incorrect_data = df[df["month"].str.isnumeric() == False]
+        df.drop(incorrect_data.index, inplace= True)
+
+        #Convert columns to datetime and aggregate into timestamp
+        df["timestamp"] =  df["timestamp"].str.replace(":", "")
+        df["month"] = df["month"].str.zfill(2)
+        df["day"] = df["day"].str.zfill(2)
+      
+        df["timestamp"] = df["year"] + df["month"] + df["day"] + df["timestamp"]
+
+        timestamp_format = "%Y%m%d%H%M%S"
+        df["timestamp"] = pd.to_datetime(df["timestamp"], format= timestamp_format, errors= "coerce")
+
+        #Drop columns with duplicate info
+        df.drop(["month", "year", "day"], axis= 1, inplace= True)
+
+        return df

@@ -74,34 +74,27 @@ class DataExtractor:
         return df
     
     def extract_from_s3(self, s3_address):
-        
-        #Initiate s3
-        s3 = boto3.client("s3", "us-east-1")
-
         #Split s3_address into elements
         string = s3_address.split("/")
         bucket = string[2]
         file = string[3]
 
+        #Initiate s3
+        s3 = boto3.client("s3", "eu-west-1")
+
         #Download file from s3 bucket
         s3.download_file(bucket, file, file)
 
         #Convert csv file to dataframe
-        df = pd.read_csv(file)
+        df = pd.read_json(file)
 
         return df
 
 #Extract data
 
 extractor = DataExtractor()
-file = 'db_creds.yaml'
-cred = extractor.read_db_creds(file)
-engine = extractor.init_db_engine()
-card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
+#file = 'db_creds.yaml'
+#cred = extractor.read_db_creds(file)
+#engine = extractor.init_db_engine()
+#card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
-lst_tables = extractor.list_db_tables(engine)
-orders_table = extractor.read_rds_table("orders_table")
-
-orders_table.to_csv("orders_table.csv", index= False)
-
-print(orders_table)
