@@ -62,15 +62,15 @@ engine = extractor.init_db_engine()
 cleaner = data_cleaning.DataCleaning()
 
 #Load data
-df = pd.read_csv("orders_table.csv")
+df = pd.read_csv("date_details.csv")
 
-clean_orders = cleaner.clean_order_data(df)
+clean_date = cleaner.clean_date_details(df)
 
 
 #Upload products data
 
 uploader = DatabaseConnector()
-data_upload = uploader.upload_to_db(clean_orders, "orders_table")
+data_upload = uploader.upload_to_db(clean_date, "dim_date_times")
 
 
 
