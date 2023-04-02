@@ -133,70 +133,75 @@ class DataCleaning:
 
         return df
     
+    def convert_product_weights(self, dataframe):
+        df = dataframe
+        
+        #Rename and set index
+        df.rename(columns= {"Unnamed: 0": "index"}, inplace= True)
+        df = df.set_index("index")
 
-#Clean products data
+        #Identify and drop incorrect data entries
+        incorrect_data = pd.read_csv("products.csv")
+        incorrect_data["product_price"] = incorrect_data["product_price"].str.strip("£")
+        incorrect_data["product_price"] = incorrect_data["product_price"].str.replace(".", "")
+        incorrect_data = incorrect_data[incorrect_data["product_price"].str.isnumeric() == False]
+        df.drop(incorrect_data.index, inplace= True)
 
-#Load file and assign index
-df = pd.read_csv("products.csv")
-df.rename(columns= {"Unnamed: 0": "index"}, inplace= True)
-df = df.set_index("index")
+        #Identify and drop empty rows
+        null_data = df[df["EAN"].isnull() == True]
+        df.drop(null_data.index, inplace= True)
 
-#Identify and drop incorrect data entries
-incorrect_data = pd.read_csv("products.csv")
-incorrect_data["product_price"] = incorrect_data["product_price"].str.strip("£")
-incorrect_data["product_price"] = incorrect_data["product_price"].str.replace(".", "")
-incorrect_data = incorrect_data[incorrect_data["product_price"].str.isnumeric() == False]
-df.drop(incorrect_data.index, inplace= True)
+        #Create column with weight units
+        df["weight"] = df["weight"].str.replace(" .", "")
+        df["weights_unit"] = df["weight"].apply(lambda x: x[-2:] if type(x) == str else x)
+        df["weights_unit"] = df["weights_unit"].str.replace('\d+', '')
 
-#Identify and drop empty rows
-null_data = df[df["EAN"].isnull() == True]
-df.drop(null_data.index, inplace= True)
+        #Clean weight column
+        df["weight"] = df["weight"].str.replace("kg", "")
+        df["weight"] = df["weight"].str.replace("g", "")
+        df["weight"] = df["weight"].str.replace("ml", "")
+        df["weight"] = df["weight"].str.replace("oz", "")
 
-#Assign product_price as float type
-df["product_price"] = df["product_price"].str.strip("£")
-df["product_price"] = df["product_price"].astype(float)
+        #Multiply values in format ___ x ___ in weight column
+        df["weight"] = df["weight"].apply(lambda x: int(x.split(" x ")[0]) * int(x.split(" x ")[1]) if " x " in str(x) else x)
 
-#Create column with weight units
-df["weight"] = df["weight"].str.replace(" .", "")
-df["weights_unit"] = df["weight"].apply(lambda x: x[-2:] if type(x) == str else x)
-df["weights_unit"] = df["weights_unit"].str.replace('\d+', '')
+        #Convert values to kg
+        df["weight"][df["weights_unit"] == "g"] = df["weight"][df["weights_unit"] == "g"].apply(lambda x : float(x)/1000)
+        df["weight"][df["weights_unit"] == "ml"] = df["weight"][df["weights_unit"] == "ml"].apply(lambda x : float(x)/1000)
+        df["weight"][df["weights_unit"] == "oz"] = df["weight"][df["weights_unit"] == "oz"].apply(lambda x : float(x)/35.274)
 
-#Clean weight column
-df["weight"] = df["weight"].str.replace("kg", "")
-df["weight"] = df["weight"].str.replace("g", "")
-df["weight"] = df["weight"].str.replace("ml", "")
-df["weight"] = df["weight"].str.replace("oz", "")
+        #Assign weight column as float type and drop weights_unit column
+        df["weight"] = df["weight"].astype(float)
+        df.drop("weights_unit", axis= 1, inplace= True)
 
-#Multiply values in format ___ x ___ in weight column
-df["weight"] = df["weight"].apply(lambda x: int(x.split(" x ")[0]) * int(x.split(" x ")[1]) if " x " in str(x) else x)
+        #Rename weight column to display unit
+        df.rename(columns= {"weight" : "weight_kg"}, inplace= True)
 
-#Convert values in g to kg
-df["weight"][df["weights_unit"] == "g"] = df["weight"][df["weights_unit"] == "g"].apply(lambda x : float(x)/1000)
-df["weight"][df["weights_unit"] == "ml"] = df["weight"][df["weights_unit"] == "ml"].apply(lambda x : float(x)/1000)
-df["weight"][df["weights_unit"] == "oz"] = df["weight"][df["weights_unit"] == "oz"].apply(lambda x : float(x)/35.274)
+        return df
+    
+    def clean_products_data(self, dataframe):
+        df = dataframe
 
-#Assign weight column as float type and drop weights_unit column
-df["weight"] = df["weight"].astype(float)
-df.drop("weights_unit", axis= 1, inplace= True)
+        #Assign product_price as float type
+        df["product_price"] = df["product_price"].str.strip("£")
+        df["product_price"] = df["product_price"].astype(float)
 
-#Assign category and removed columns as category type
-df[["category", "removed"]] = df[["category", "removed"]].astype("category")
+        #Assign category and removed columns as category type
+        df[["category", "removed"]] = df[["category", "removed"]].astype("category")
 
-#Assign EAN column as int type
-df["EAN"] = df["EAN"].astype(int, errors= "ignore")
+        #Assign EAN column as int type
+        df["EAN"] = df["EAN"].astype(int, errors= "ignore")
 
-#Convert data_added column to datetime
-df["date_added"] =  df["date_added"].str.replace("-", "")
+        #Convert data_added column to datetime
+        df["date_added"] =  df["date_added"].str.replace("-", "")
 
-opening_date_format = "%Y%m%d"
-df["date_added"] = pd.to_datetime(df["date_added"], format= opening_date_format, errors= "coerce")
+        opening_date_format = "%Y%m%d"
+        df["date_added"] = pd.to_datetime(df["date_added"], format= opening_date_format, errors= "coerce")
 
-#Change column order to be more intuitive
-df = df.loc[:, ["product_name", "product_price", "weight", "category", 
-                "date_added", "removed", "product_code", "EAN", "uuid"]]
+        #Change column order to be more intuitive
+        df = df.loc[:, ["product_name", "product_price", "weight_kg", "category", 
+                        "date_added", "removed", "product_code", "EAN", "uuid"]]
+        
+        return df
 
-
-
-print(df)
-print(df.info())
 

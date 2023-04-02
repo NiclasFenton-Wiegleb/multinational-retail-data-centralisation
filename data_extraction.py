@@ -90,3 +90,13 @@ class DataExtractor:
         df = pd.read_csv(file)
 
         return df
+
+#Extract data
+
+extractor = DataExtractor()
+file = 'db_creds.yaml'
+cred = extractor.read_db_creds(file)
+engine = extractor.init_db_engine()
+card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
+
+lst_tables = extractor.list_db_tables(engine)

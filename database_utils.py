@@ -57,15 +57,21 @@ cred = extractor.read_db_creds(file)
 engine = extractor.init_db_engine()
 card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
-df = pd.read_csv("store_data.csv")
-
 #cleaned data:
 
 cleaner = data_cleaning.DataCleaning()
-clean_store_details = cleaner.clean_store_data(df)
+
+#Load file and assign index
+df = pd.read_csv("products.csv")
+
+converted_df = cleaner.convert_product_weights(df)
+clean_df = cleaner.clean_products_data(converted_df)
 
 
-#Upload clean_user_data
+#Upload products data
 
 uploader = DatabaseConnector()
-data_upload = uploader.upload_to_db(clean_store_details, "dim_store_details")
+data_upload = uploader.upload_to_db(clean_df, "dim_products")
+
+
+
