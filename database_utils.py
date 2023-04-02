@@ -55,23 +55,22 @@ extractor = data_extraction.DataExtractor()
 file = 'db_creds.yaml'
 cred = extractor.read_db_creds(file)
 engine = extractor.init_db_engine()
-card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
+#card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
 #cleaned data:
 
 cleaner = data_cleaning.DataCleaning()
 
-#Load file and assign index
-df = pd.read_csv("products.csv")
+#Load data
+df = pd.read_csv("orders_table.csv")
 
-converted_df = cleaner.convert_product_weights(df)
-clean_df = cleaner.clean_products_data(converted_df)
+clean_orders = cleaner.clean_order_data(df)
 
 
 #Upload products data
 
 uploader = DatabaseConnector()
-data_upload = uploader.upload_to_db(clean_df, "dim_products")
+data_upload = uploader.upload_to_db(clean_orders, "orders_table")
 
 
 
