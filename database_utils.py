@@ -12,13 +12,13 @@ class DatabaseConnector:
     def upload_to_db(self, dataframe, table_name):
 
         #Connect to database
-        db_engine = sqlalchemy.create_engine(url = "postgresql://postgres:Nick11375@localhost/Sales_Data")
+        db_engine = sqlalchemy.create_engine(url = "postgresql://postgres:password@localhost/Sales_Data")
 
         #Upload dataframe to database
         conn = psycopg2.connect(
             database= "Sales_Data",
             user= "postgres",
-            password= "Nick11375",
+            password= "password",
             host= "localhost",
             port= "5432"
         )
