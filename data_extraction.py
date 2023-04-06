@@ -80,13 +80,13 @@ class DataExtractor:
         file = string[3]
 
         #Initiate s3
-        s3 = boto3.client("s3", "eu-west-1")
+        s3 = boto3.client("s3", "us-east-1")
 
         #Download file from s3 bucket
         s3.download_file(bucket, file, file)
 
         #Convert csv file to dataframe
-        df = pd.read_json(file)
+        df = pd.read_csv(file)
 
         return df
 
@@ -98,3 +98,8 @@ extractor = DataExtractor()
 #engine = extractor.init_db_engine()
 #card_details = extractor.retrieve_pdf_data("https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf")
 
+link = "https://data-handling-public.s3.eu-west-1.amazonaws.com/card_details.pdf"
+
+df = extractor.retrieve_pdf_data(link)
+
+#df.to_csv("products.csv")

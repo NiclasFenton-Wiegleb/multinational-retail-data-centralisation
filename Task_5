@@ -1,0 +1,14 @@
+WITH store_orders_product AS (
+	SELECT *
+	FROM dim_store_details
+	JOIN orders_table ON dim_store_details.store_code = orders_table.store_code
+	JOIN dim_products ON orders_table.product_code = dim_products.product_code
+)
+		SELECT store_type,
+			SUM(product_quantity*product_price) AS total_sales,
+			SUM(product_quantity*product_price) * 100.00 / 
+			(SELECT SUM(product_quantity*product_price) FROM store_orders_product) AS percentage_total
+		FROM store_orders_product
+		GROUP BY store_type
+		ORDER BY percentage_total DESC;
+			

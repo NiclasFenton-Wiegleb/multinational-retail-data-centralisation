@@ -1,0 +1,28 @@
+/* Add actual_time_taken column to dim_date_times. */
+ALTER TABLE dim_date_times
+	ADD COLUMN actual_time_taken interval
+
+
+/* Update the values in the actual_time_taken column by subtracting the current timestamp with the one from
+the closest preceeding timestamp. */
+UPDATE dim_date_times
+	SET actual_time_taken = previous_sale.actual_time_taken
+	FROM
+		(
+			SELECT timestamp - MIN(timestamp) OVER (ORDER BY timestamp ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING)
+			AS actual_time_taken,
+			timestamp,
+			year,
+			index
+			FROM dim_date_times
+			GROUP BY year, timestamp, index
+		) AS previous_sale
+	WHERE previous_sale.index = dim_date_times.index;
+
+/* Select the average time between sales per year.*/
+	
+SELECT year,
+	AVG(actual_time_taken) AS avg_actual_time_taken
+FROM dim_date_times
+GROUP BY year
+ORDER BY avg_actual_time_taken DESC;

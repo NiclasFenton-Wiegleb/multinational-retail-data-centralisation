@@ -57,7 +57,7 @@ class DataCleaning:
     def clean_card_data(self, dataframe):
 
         #Drop incorrect format in card_number column
-        dataframe["card_number"] = dataframe["card_number"].str[-16:]
+        dataframe["card_number"] = dataframe["card_number"].str.strip("?")
         incorrect_data = dataframe[dataframe["card_number"].str.isnumeric() == False]
         df = dataframe.drop(incorrect_data.index)
 
@@ -68,14 +68,11 @@ class DataCleaning:
         df["card_number"] =  df["card_number"].astype("int")
 
 
-        #Change columns to datatime.
-        df["expiry_date"] =  df["expiry_date"].str.replace("/", "")
+        #Change column to datatime
         df["date_payment_confirmed"] =  df["date_payment_confirmed"].str.replace("-", "")
 
-        expiry_date_format = "%m%y"
         payment_date_format = "%Y%m%d"
 
-        df["expiry_date"] = pd.to_datetime(df["expiry_date"], format= expiry_date_format, errors= "coerce")
         df["date_payment_confirmed"] = pd.to_datetime(df["date_payment_confirmed"], format= payment_date_format,
                                                     errors= "coerce")
 
@@ -236,7 +233,16 @@ class DataCleaning:
         timestamp_format = "%Y%m%d%H%M%S"
         df["timestamp"] = pd.to_datetime(df["timestamp"], format= timestamp_format, errors= "coerce")
 
-        #Drop columns with duplicate info
-        df.drop(["month", "year", "day"], axis= 1, inplace= True)
-
         return df
+'''
+df = pd.read_csv("pdf_to_csv.csv")
+
+cleaner = DataCleaning()
+
+clean_card = cleaner.clean_card_data(df)
+
+
+print(clean_card[clean_card["card_number"] == 4537509987455280000])
+#print(df.info())
+print(clean_card.head(20))
+'''

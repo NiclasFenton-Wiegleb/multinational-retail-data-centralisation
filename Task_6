@@ -1,0 +1,14 @@
+WITH date_orders_product AS (
+	SELECT *
+	FROM orders_table
+	JOIN dim_products ON orders_table.product_code = dim_products.product_code
+	JOIN dim_date_times ON orders_table.date_uuid = dim_date_times.date_uuid
+)
+		SELECT
+			SUM(product_quantity*product_price) AS total_sales,
+			year,
+			month
+		FROM date_orders_product
+		GROUP BY year, month
+		ORDER BY total_sales DESC;
+			

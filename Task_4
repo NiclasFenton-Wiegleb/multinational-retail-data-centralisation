@@ -1,0 +1,22 @@
+/* Add column called 'location'. */
+ALTER TABLE dim_store_details
+	ADD location VARCHAR(11);
+
+/* Update new column based on store_type in the dim_store_details table. */
+UPDATE dim_store_details
+	SET location = 'Offline'
+	WHERE store_type != 'Web Portal';
+
+/* Join dim_store_details and orders_table tables, select columns with 
+appropriate aggregations and group by location. */
+WITH store_orders AS (
+	SELECT *
+	FROM dim_store_details
+	JOIN orders_table ON dim_store_details.store_code = orders_table.store_code
+)
+		SELECT COUNT(date_uuid) AS number_of_sales,
+		SUM(product_quantity) AS product_quantity_count,
+			location
+		FROM store_orders AS sales_product
+		GROUP BY location
+		ORDER BY number_of_sales DESC;

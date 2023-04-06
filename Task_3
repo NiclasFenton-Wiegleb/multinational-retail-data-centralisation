@@ -1,0 +1,107 @@
+/* All product ever sold per month.*/
+
+WITH dates_orders AS 
+	(SELECT *
+	FROM
+		dim_date_times
+	INNER JOIN
+	orders_table ON dim_date_times.date_uuid = orders_table.date_uuid)
+		SELECT month, SUM(product_quantity) AS total_product_sold
+		FROM dates_orders
+		GROUP BY month
+		ORDER BY month ASC;
+	
+
+/* Average product quantity sold per month each year.*/
+
+WITH dates_orders AS 
+	(SELECT *
+	FROM
+		dim_date_times
+	INNER JOIN
+	orders_table ON dim_date_times.date_uuid = orders_table.date_uuid)
+		SELECT  AVG(sum_sales) AS avg_product_sold,
+		month
+		FROM(
+				SELECT year, month, sum(product_quantity) AS sum_sales
+				FROM dates_orders
+				GROUP BY year, month
+				ORDER BY year DESC
+			) AS sum_per_month
+		GROUP BY month
+		ORDER BY avg_sales DESC;
+
+/* All individual sales ever made per month. */
+
+WITH dates_orders AS 
+	(SELECT *
+	FROM
+		dim_date_times
+	INNER JOIN
+	orders_table ON dim_date_times.date_uuid = orders_table.date_uuid)
+		SELECT month, COUNT(user_uuid) AS total_sales
+		FROM dates_orders
+		GROUP BY month
+		ORDER BY month ASC;
+
+/* Average number of sales per month each year.*/
+
+WITH dates_orders AS 
+	(SELECT *
+	FROM
+		dim_date_times
+	INNER JOIN
+	orders_table ON dim_date_times.date_uuid = orders_table.date_uuid)
+		SELECT  AVG(sum_sales) AS avg_sales,
+		month
+		FROM(
+				SELECT year, month, COUNT(user_uuid) AS sum_sales
+				FROM dates_orders
+				GROUP BY year, month
+				ORDER BY year DESC
+			) AS sum_per_month
+		GROUP BY month
+		ORDER BY avg_sales DESC;
+
+
+/* Average revenue per month each year. */
+
+WITH sales_table AS(
+	SELECT *
+	FROM
+		dim_date_times
+	INNER JOIN
+	orders_table ON dim_date_times.date_uuid = orders_table.date_uuid
+	INNER JOIN
+	dim_products ON orders_table.product_code = dim_products.product_code)
+		SELECT  AVG(sum_sales) AS avg_sales,
+		month
+		FROM(
+				SELECT year, month, SUM(product_quantity*product_price) AS sum_sales
+				FROM sales_table
+				GROUP BY year, month
+				ORDER BY year DESC
+			) AS sum_per_month
+		GROUP BY month
+		ORDER BY avg_sales DESC;
+
+/* Total revenue per month over all time. */
+
+WITH sales_table AS(
+	SELECT *
+	FROM
+		dim_date_times
+	INNER JOIN
+	orders_table ON dim_date_times.date_uuid = orders_table.date_uuid
+	INNER JOIN
+	dim_products ON orders_table.product_code = dim_products.product_code)
+		SELECT  SUM(sum_sales) AS total_sales,
+		month
+		FROM(
+				SELECT year, month, SUM(product_quantity*product_price) AS sum_sales
+				FROM sales_table
+				GROUP BY year, month
+				ORDER BY year DESC
+			) AS sum_per_month
+		GROUP BY month
+		ORDER BY total_sales DESC;
