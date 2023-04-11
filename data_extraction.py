@@ -16,8 +16,13 @@ class DataExtractor:
         
 
     def read_db_creds(self, cred_file):
+
+        #Open the filde containing credentials
         with open(cred_file, 'r') as f:
             credentials = yaml.safe_load(f)
+
+            #Assign credentials to class object attributes
+            #so they can be used in other methods after running this one
             self.host = credentials["RDS_HOST"]
             self.password = credentials["RDS_PASSWORD"]
             self.user = credentials["RDS_USER"]
@@ -26,18 +31,26 @@ class DataExtractor:
             return credentials
         
     def init_db_engine(self):
+        
+        #Initialise sqlalchemy engine
         db_engine = sqlalchemy.create_engine(url = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
             self.user, self.password, self.host, self.port, self.database
         ))
         return db_engine
     
     def list_db_tables(self, engine):
+
+        #Initialise metadata object and use it to retrieve list of tables
+        # in database
         metadata_obj = sqlalchemy.MetaData()
         metadata_obj.reflect(bind=engine)
         list_tables = list(metadata_obj.tables.keys())
         return list_tables
     
     def read_rds_table(self, table_name):
+
+        #Connect to database using credentials assigned to class object
+        # and retrieve table as dataframe
         connection = sqlalchemy.create_engine(url = "postgresql://{0}:{1}@{2}:{3}/{4}".format(
             self.user, self.password, self.host, self.port, self.database
         )).connect()
@@ -45,11 +58,16 @@ class DataExtractor:
         return df
     
     def retrieve_pdf_data(self, pdf_path):
+
+        #Using tabula package to convert pdf into csv file and assign
+        # it as a dataframe
         tabula.convert_into(pdf_path, "pdf_to_csv.csv", output_format= "csv", pages= "all")
         df = pd.read_csv("pdf_to_csv.csv")
         return df
     
     def list_number_of_stores(self, api, auth_details):
+
+        #Initialise api request and assign file as data
         request = requests.get(api, headers= auth_details)
         data = request.json()
         return data["number_stores"]
