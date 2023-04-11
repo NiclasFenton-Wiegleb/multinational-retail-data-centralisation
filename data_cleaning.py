@@ -234,15 +234,3 @@ class DataCleaning:
         df["timestamp"] = pd.to_datetime(df["timestamp"], format= timestamp_format, errors= "coerce")
 
         return df
-'''
-df = pd.read_csv("pdf_to_csv.csv")
-
-cleaner = DataCleaning()
-
-clean_card = cleaner.clean_card_data(df)
-
-
-print(clean_card[clean_card["card_number"] == 4537509987455280000])
-#print(df.info())
-print(clean_card.head(20))
-'''
