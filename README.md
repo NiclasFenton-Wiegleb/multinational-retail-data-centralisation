@@ -44,18 +44,18 @@ Now that the database is complete and the star-based schema set up, SQL queries 
 
 Task 1: How many stores does the business have and in which countries?
 
-'''
+```
 
 SELECT country_code AS country,
 	COUNT(store_code) AS total_no_stores
 	FROM dim_store_details
 	GROUP BY country;
 
-'''
+```
 
 Task 2: Which locations currently have the most stores?
 
-'''
+```
 
 SELECT locality,
 	COUNT(store_code) AS total_no_stores
@@ -63,11 +63,11 @@ SELECT locality,
 	GROUP BY locality
 	ORDER BY total_no_stores DESC;
 
-'''
+```
 
 Task 3: Which months typically produce the average highest revenue?
 
-'''
+```
 
 /* Average revenue per month each year. */
 
@@ -111,11 +111,11 @@ WITH sales_table AS(
 		GROUP BY month
 		ORDER BY total_sales DESC;
 
-'''
+```
 
 Task 4: How many sales are coming from online?
 
-'''
+```
 
 /* Add column called 'location'. */
 ALTER TABLE dim_store_details
@@ -140,11 +140,11 @@ WITH store_orders AS (
 		GROUP BY location
 		ORDER BY number_of_sales DESC;
 
-'''
+```
 
 Task 5: What percentage of sales come through each type of store?
 
-'''
+```
 
 WITH store_orders_product AS (
 	SELECT *
@@ -160,11 +160,11 @@ WITH store_orders_product AS (
 		GROUP BY store_type
 		ORDER BY percentage_total DESC;
 
-'''
+```
 
 Task 6: Which month in each year produced the highest cost of sales?
 
-'''
+```
 
 WITH date_orders_product AS (
 	SELECT *
@@ -180,11 +180,11 @@ WITH date_orders_product AS (
 		GROUP BY year, month
 		ORDER BY total_sales DESC;
 
-'''
+```
 
 Task 7: What is our staff headcount?
 
-'''
+```
 
 SELECT SUM(staff_numbers) AS total_staff_numbers,
 	country_code
@@ -192,11 +192,11 @@ SELECT SUM(staff_numbers) AS total_staff_numbers,
 	GROUP BY country_code
 	ORDER BY total_staff_numbers DESC;
 
-'''
+```
 
 Task 8: Which German store type is selling the most?
 
-'''
+```
 
 WITH store_orders_product AS (
 	SELECT *
@@ -213,11 +213,11 @@ WITH store_orders_product AS (
 		GROUP BY country_code, store_type
 		ORDER BY total_sales ASC;
 
-'''
+```
 
 Task 9: How quickly is the company making sales?
 
-'''
+```
 
 /* Add actual_time_taken column to dim_date_times. */
 ALTER TABLE dim_date_times
@@ -248,4 +248,4 @@ FROM dim_date_times
 GROUP BY year
 ORDER BY avg_actual_time_taken DESC;
 
-'''
+```
