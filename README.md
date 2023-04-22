@@ -11,7 +11,7 @@ Technologies used:
 - API
 - s3 buckets
 - pgAdmin4
-- Postgresql
+- PostgreSQL
 
 Dependencies:
 
@@ -24,7 +24,13 @@ Dependencies:
 
 ## Milestone 1 - Extract and Clean Sales Data
 
+The various datasets are stored in various formats and locations. Therefore, a pipline is required to extract the data, clean it and format it to be consistent and usable once it's uploaded to a database created in pgAdmin4. See some of the formats and data sources below:
 
+- AWS RDS database
+- PDF in AWS S3 bucket
+- JSON stored on server
+
+The pipline established to achieve this task consists of data_extraction.py, data_cleaning.py and database_utils.py. The first has methods to retrieve the data from the various locations it is stored and pass it to the methods contained in the second script. As each extracted dataset requires different forms of cleaning, data_cleaning.py contains a method for each dataset and converts the raw data into a usable format. Finally, database_utils.py uploads the clean data to the database on a local server and accessible via pgAdmin4.
 
 ## Milestone 2 - Create DataBase Schema
 
