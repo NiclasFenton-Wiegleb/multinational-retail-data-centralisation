@@ -34,6 +34,8 @@ The pipline established to achieve this task consists of data_extraction.py, dat
 
 ## Milestone 2 - Create DataBase Schema
 
+With the data uploaded, some adjustments need to be made to ensure columns are assigned the correct data type etc. and some additional columns are needed (e.g. to categorise the weight range in the "products" table as light, mid-sized, heavy or requiring a truck to ship). For each table the primary key needs to be chosen based on which columns contain unique identifiers and are also present in the "orders" table.
 
+Once the primary keys have been assigned, a star-based schema is established for the database by assigning foreign key constraints to the appropriate columns in the "orders" table to link them to the primary keys set in the other tables.
 
 ## Milestone 3 - Query Data
