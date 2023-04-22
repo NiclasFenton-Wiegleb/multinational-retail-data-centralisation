@@ -3,6 +3,16 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+#API keys and secrets
+config.py
+__pycache__
+.ipynb_checkpoints
+
+#API keys and secrets
+db_creds.yaml
+__pycache__
+.ipynb_checkpoints
+
 # C extensions
 *.so
 
