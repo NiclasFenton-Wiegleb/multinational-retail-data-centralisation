@@ -2,6 +2,7 @@ import data_cleaning
 import data_extraction
 import sqlalchemy
 import psycopg2
+import config
 import pandas as pd
 
 class DatabaseConnector:
@@ -11,14 +12,16 @@ class DatabaseConnector:
 
     def upload_to_db(self, dataframe, table_name):
 
+        password = config.password
+
         #Connect to database
-        db_engine = sqlalchemy.create_engine(url = "postgresql://postgres:password@localhost/Sales_Data")
+        db_engine = sqlalchemy.create_engine(url = f"postgresql://postgres:{password}@localhost/Sales_Data")
 
         #Upload dataframe to database
         conn = psycopg2.connect(
             database= "Sales_Data",
             user= "postgres",
-            password= "password",
+            password= f"{password}",
             host= "localhost",
             port= "5432"
         )
