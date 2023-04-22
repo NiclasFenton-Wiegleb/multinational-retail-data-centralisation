@@ -45,6 +45,7 @@ Now that the database is complete and the star-based schema set up, SQL queries 
 Task 1: How many stores does the business have and in which countries?
 
 '''
+
 SELECT country_code AS country,
 	COUNT(store_code) AS total_no_stores
 	FROM dim_store_details
@@ -55,16 +56,19 @@ SELECT country_code AS country,
 Task 2: Which locations currently have the most stores?
 
 '''
+
 SELECT locality,
 	COUNT(store_code) AS total_no_stores
 	FROM dim_store_details
 	GROUP BY locality
 	ORDER BY total_no_stores DESC;
+
 '''
 
 Task 3: Which months typically produce the average highest revenue?
 
 '''
+
 /* Average revenue per month each year. */
 
 WITH sales_table AS(
@@ -106,11 +110,13 @@ WITH sales_table AS(
 			) AS sum_per_month
 		GROUP BY month
 		ORDER BY total_sales DESC;
+
 '''
 
 Task 4: How many sales are coming from online?
 
 '''
+
 /* Add column called 'location'. */
 ALTER TABLE dim_store_details
 	ADD location VARCHAR(11);
@@ -133,11 +139,13 @@ WITH store_orders AS (
 		FROM store_orders AS sales_product
 		GROUP BY location
 		ORDER BY number_of_sales DESC;
+
 '''
 
 Task 5: What percentage of sales come through each type of store?
 
 '''
+
 WITH store_orders_product AS (
 	SELECT *
 	FROM dim_store_details
@@ -151,11 +159,13 @@ WITH store_orders_product AS (
 		FROM store_orders_product
 		GROUP BY store_type
 		ORDER BY percentage_total DESC;
+
 '''
 
 Task 6: Which month in each year produced the highest cost of sales?
 
 '''
+
 WITH date_orders_product AS (
 	SELECT *
 	FROM orders_table
@@ -169,21 +179,25 @@ WITH date_orders_product AS (
 		FROM date_orders_product
 		GROUP BY year, month
 		ORDER BY total_sales DESC;
+
 '''
 
 Task 7: What is our staff headcount?
 
 '''
+
 SELECT SUM(staff_numbers) AS total_staff_numbers,
 	country_code
 	FROM dim_store_details
 	GROUP BY country_code
 	ORDER BY total_staff_numbers DESC;
+
 '''
 
 Task 8: Which German store type is selling the most?
 
 '''
+
 WITH store_orders_product AS (
 	SELECT *
 	FROM orders_table
@@ -198,11 +212,13 @@ WITH store_orders_product AS (
 		WHERE country_code = 'DE'
 		GROUP BY country_code, store_type
 		ORDER BY total_sales ASC;
+
 '''
 
 Task 9: How quickly is the company making sales?
 
 '''
+
 /* Add actual_time_taken column to dim_date_times. */
 ALTER TABLE dim_date_times
 	ADD COLUMN actual_time_taken interval
@@ -231,4 +247,5 @@ SELECT year,
 FROM dim_date_times
 GROUP BY year
 ORDER BY avg_actual_time_taken DESC;
+
 '''
